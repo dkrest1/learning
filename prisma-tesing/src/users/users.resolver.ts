@@ -10,10 +10,10 @@ export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
   @Mutation(() => User)
-  sinUpUser(
-    @Args('createUserInput') createUserInput: CreateUserInput,
+  registerUser(
+    @Args('registerUser') registerUserInput: { name?: string; email: string },
   ): Promise<UserModel> {
-    return;
+    return this.usersService.createUser(registerUserInput);
   }
 
   @Query(() => [User], { name: 'users' })
