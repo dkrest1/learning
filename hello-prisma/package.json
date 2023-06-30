@@ -1,0 +1,22 @@
+{
+  "name": "hello-prisma",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"command1 arg\" \"command2 arg\""
+  },
+  "keywords": [],
+  "author": "oluatosin akande <aktosin1@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.3.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.16.1",
+    "prisma": "^4.16.1"
+  }
+}
