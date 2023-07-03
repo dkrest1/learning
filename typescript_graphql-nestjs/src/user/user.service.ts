@@ -1,29 +1,103 @@
-import { Injectable } from '@nestjs/common';
-import { User, Prisma } from '@prisma/client';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { User, Post } from '@prisma/client';
+import { UserCreateInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
+import { UserUniqueInput } from './dto/get-user.input';
 import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.UserCreateInput): Promise<User | null> {
-    return await this.prisma.user.create({ data });
+  async create(userCreateInput: UserCreateInput): Promise<User | null> {
+    const postData = userCreateInput.posts?.map((post) => {
+      return { title: post.title, content: post.content || undefined };
+    });
+    return await this.prisma.user.create({
+      data: {
+        name: userCreateInput.name,
+        email: userCreateInput.email,
+        posts: {
+          create: postData,
+        },
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll(): Promise<User[] | null> {
+    return await this.prisma.user.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(userId: number): Promise<Post[] | null> {
+    const posts = await this.prisma.user
+      .findUnique({
+        where: {
+          id: userId,
+        },
+      })
+      .posts();
+
+    if (!posts) {
+      throw new HttpException('No post found.', HttpStatus.NOT_FOUND);
+    }
+
+    return posts;
   }
 
-  update(id: number, updateUserInput: UpdateUserInput) {
-    return `This action updates a #${id} user`;
+  async draftByUser(userUniqueInput: UserUniqueInput): Promise<Post[]> {
+    return await this.prisma.user
+      .findUnique({
+        where: {
+          id: userUniqueInput.id || undefined,
+          email: userUniqueInput.email || undefined,
+        },
+      })
+      .posts({
+        where: {
+          published: false,
+        },
+      });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async update(
+    userId: number,
+    updateUserInput: UpdateUserInput,
+  ): Promise<User> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    const updateUser = await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        name: updateUserInput.name,
+        email: updateUserInput.email,
+      },
+    });
+
+    return updateUser;
+  }
+
+  async remove(userId: number): Promise<User> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    return await this.prisma.user.delete({
+      where: {
+        id: userId,
+      },
+    });
   }
 }

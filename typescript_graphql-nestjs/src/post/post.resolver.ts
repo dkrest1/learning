@@ -65,7 +65,7 @@ export class PostResolver {
     });
   }
 
-  @Mutation((returns) => Post)
+  @Mutation(() => Post)
   createDraft(
     @Args('data') data: PostCreateInput,
     @Args('authorEmail') authorEmail: string,

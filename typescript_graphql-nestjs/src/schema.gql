@@ -48,6 +48,8 @@ enum SortOrderEnum {
 
 type Mutation {
   signupUser(data: UserCreateInput!): User!
+  updateUser(id: Float!, data: UpdateUserInput!): User!
+  deleteUser(id: Float!): User!
   createDraft(data: PostCreateInput!, authorEmail: String!): Post!
   incrementPostViewCount(id: Float!): Post!
   togglePublishPost(id: Float!): Post
@@ -63,4 +65,10 @@ input UserCreateInput {
 input PostCreateInput {
   title: String!
   content: String
+}
+
+input UpdateUserInput {
+  email: String!
+  name: String
+  id: Int!
 }

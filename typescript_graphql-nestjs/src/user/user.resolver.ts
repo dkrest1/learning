@@ -9,67 +9,53 @@ import {
   Root,
 } from '@nestjs/graphql';
 import { Inject } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 import { UserCreateInput } from './dto/create-user.input';
 import { UserUniqueInput } from './dto/get-user.input';
 import { User } from './entities/user.entity';
 import { Post } from 'src/post/entities/post.entity';
+import { UserService } from './user.service';
+import { UpdateUserInput } from './dto/update-user.input';
 
 @Resolver(User)
 export class UserResolver {
-  constructor(@Inject(PrismaService) private prismaService: PrismaService) {}
-
-  @ResolveField()
-  async posts(@Root() user: User, @Context() ctx): Promise<Post[]> {
-    return this.prismaService.user
-      .findUnique({
-        where: {
-          id: user.id,
-        },
-      })
-      .posts();
-  }
+  constructor(private userService: UserService) {}
 
   @Mutation(() => User)
   async signupUser(
-    @Args('data') data: UserCreateInput,
+    @Args('data') userCreateInput: UserCreateInput,
     @Context() ctx,
   ): Promise<User> {
-    const postData = data.posts?.map((post) => {
-      return { title: post.title, content: post.content || undefined };
-    });
+    return await this.userService.create(userCreateInput);
+  }
 
-    return this.prismaService.user.create({
-      data: {
-        email: data.email,
-        name: data.name,
-        posts: {
-          create: postData,
-        },
-      },
-    });
+  @ResolveField()
+  async posts(@Root() user: User, @Context() ctx): Promise<Post[]> {
+    return await this.userService.findOne(user.id);
   }
 
   @Query(() => [User], { nullable: true })
-  async allUsers(@Context() ctx) {
-    return this.prismaService.user.findMany();
+  async allUsers(@Context() ctx): Promise<User[] | null> {
+    return await this.userService.findAll();
   }
 
   @Query(() => [Post], { nullable: true })
   async draftsByUser(
     @Args('userUniqueInput') userUniqueInput: UserUniqueInput,
   ): Promise<Post[]> {
-    return this.prismaService.user
-      .findUnique({
-        where: {
-          id: userUniqueInput.id || undefined,
-          email: userUniqueInput.email || undefined,
-        },
-      })
-      .posts({
-        where: {
-          published: false,
-        },
-      });
+    return await this.userService.draftByUser(userUniqueInput);
+  }
+
+  @Mutation(() => User)
+  async updateUser(
+    @Args('id') userId: number,
+    @Args('data') userUpdateInput: UpdateUserInput,
+  ): Promise<User> {
+    return await this.userService.update(userId, userUpdateInput);
+  }
+
+  @Mutation(() => User)
+  async deleteUser(@Args('id') userId: number): Promise<User> {
+    return await this.userService.remove(userId);
   }
 }

@@ -4,6 +4,7 @@ import { join } from 'path';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PostModule } from './post/post.module';
     }),
     UserModule,
     PostModule,
+    TransactionModule,
   ],
   controllers: [],
   providers: [],
