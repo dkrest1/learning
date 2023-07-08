@@ -10,6 +10,15 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async create(userCreateInput: UserCreateInput): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: userCreateInput.email,
+      },
+    });
+
+    if (user) {
+      throw new HttpException('Sorry user exist', HttpStatus.BAD_REQUEST);
+    }
     const postData = userCreateInput.posts?.map((post) => {
       return { title: post.title, content: post.content || undefined };
     });
@@ -28,20 +37,18 @@ export class UserService {
     return await this.prisma.user.findMany();
   }
 
-  async findOne(userId: number): Promise<Post[] | null> {
-    const posts = await this.prisma.user
-      .findUnique({
-        where: {
-          id: userId,
-        },
-      })
-      .posts();
+  async findOne(userId: number): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
 
-    if (!posts) {
-      throw new HttpException('No post found.', HttpStatus.NOT_FOUND);
+    if (!user) {
+      throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
     }
 
-    return posts;
+    return user;
   }
 
   async draftByUser(userUniqueInput: UserUniqueInput): Promise<Post[]> {
