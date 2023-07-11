@@ -70,5 +70,4 @@ input PostCreateInput {
 input UpdateUserInput {
   email: String!
   name: String
-  id: Int!
 }
