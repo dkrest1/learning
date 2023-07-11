@@ -1,5 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
+import { createMock, DeepMocked } from '@golevelup/ts-jest';
+import { PrismaService } from 'prisma/prisma.service';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -7,7 +9,9 @@ describe('UserService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [UserService],
-    }).compile();
+    })
+      .useMocker(createMock)
+      .compile();
 
     userService = module.get<UserService>(UserService);
   });

@@ -29,9 +29,9 @@ export class UserResolver {
     return await this.userService.create(userCreateInput);
   }
 
-  @ResolveField()
-  async posts(@Root() user: User, @Context() ctx): Promise<Post[]> {
-    return await this.userService.findOne(user.id);
+  @Query(() => User)
+  async posts(@Args('id') id: number, @Context() ctx): Promise<User> {
+    return await this.userService.findOne(id);
   }
 
   @Query(() => [User], { nullable: true })

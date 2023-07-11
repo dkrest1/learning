@@ -26,6 +26,7 @@ type User {
 }
 
 type Query {
+  posts(id: Float!): User!
   allUsers: [User!]
   draftsByUser(userUniqueInput: UserUniqueInput!): [Post!]
   postById(id: Float!): Post
