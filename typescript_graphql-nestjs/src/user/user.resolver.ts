@@ -1,15 +1,5 @@
 import 'reflect-metadata';
-import {
-  Resolver,
-  Query,
-  Mutation,
-  Args,
-  Context,
-  ResolveField,
-  Root,
-} from '@nestjs/graphql';
-import { Inject } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { UserCreateInput } from './dto/create-user.input';
 import { UserUniqueInput } from './dto/get-user.input';
 import { User } from './entities/user.entity';
@@ -24,25 +14,24 @@ export class UserResolver {
   @Mutation(() => User)
   async signupUser(
     @Args('data') userCreateInput: UserCreateInput,
-    @Context() ctx,
   ): Promise<User> {
     return await this.userService.create(userCreateInput);
   }
 
   @Query(() => User)
-  async posts(@Args('id') id: number, @Context() ctx): Promise<User> {
+  async posts(@Args('id') id: number): Promise<User | null> {
     return await this.userService.findOne(id);
   }
 
   @Query(() => [User], { nullable: true })
-  async allUsers(@Context() ctx): Promise<User[] | null> {
+  async allUsers(): Promise<User[] | null> {
     return await this.userService.findAll();
   }
 
   @Query(() => [Post], { nullable: true })
   async draftsByUser(
     @Args('userUniqueInput') userUniqueInput: UserUniqueInput,
-  ): Promise<Post[]> {
+  ): Promise<Post[] | null> {
     return await this.userService.draftByUser(userUniqueInput);
   }
 

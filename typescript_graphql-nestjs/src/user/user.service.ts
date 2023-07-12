@@ -3,16 +3,18 @@ import { User, Post } from '@prisma/client';
 import { UserCreateInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { UserUniqueInput } from './dto/get-user.input';
-import { PrismaService } from 'prisma/prisma.service';
-
+import { PrismaService } from '../../prisma/prisma.service';
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async create(userCreateInput: UserCreateInput): Promise<User | null> {
+  async create(userCreateInput: UserCreateInput): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: {
         email: userCreateInput.email,
+      },
+      include: {
+        posts: true,
       },
     });
 
@@ -30,11 +32,14 @@ export class UserService {
           create: postData,
         },
       },
+      include: {
+        posts: true,
+      },
     });
   }
 
   async findAll(): Promise<User[] | null> {
-    return await this.prisma.user.findMany();
+    return await this.prisma.user.findMany({ include: { posts: true } });
   }
 
   async findOne(userId: number): Promise<User | null> {
@@ -51,11 +56,10 @@ export class UserService {
     return user;
   }
 
-  async draftByUser(userUniqueInput: UserUniqueInput): Promise<Post[]> {
+  async draftByUser(userUniqueInput: UserUniqueInput): Promise<Post[] | null> {
     return await this.prisma.user
       .findUnique({
         where: {
-          id: userUniqueInput.id || undefined,
           email: userUniqueInput.email || undefined,
         },
       })
