@@ -28,14 +28,9 @@ type User {
 type Query {
   posts(id: Float!): User!
   allUsers: [User!]
-  draftsByUser(userUniqueInput: UserUniqueInput!): [Post!]
+  draftsByUser(email: String!): [Post!]
   postById(id: Float!): Post
   feed(searchString: String, skip: Float, take: Float, orderBy: PostOrderByUpdatedAtInput): [Post!]!
-}
-
-input UserUniqueInput {
-  id: Float
-  email: String
 }
 
 input PostOrderByUpdatedAtInput {

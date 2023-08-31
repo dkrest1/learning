@@ -117,7 +117,26 @@ describe('UserService', () => {
     });
   });
 
-  describe('get all draft posts by a user', () => {});
+  describe('draft by user', () => {
+    it('it should return a post that is not published by a user', async () => {
+      const data = {
+        id: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        title: 'hello',
+        content: 'please tell me',
+        published: false,
+        viewCount: 1,
+        authorId: 1,
+      };
+
+      prisma.post.findUnique.mockResolvedValue(data);
+      const draft = await userService.draftByUser(user.email);
+      expect(draft).toEqual(data);
+      expect(draft).toHaveBeenCalledWith(user.email);
+      expect(draft).toHaveBeenCalledWith({ where: { published: false } });
+    });
+  });
 
   describe('update an existing user', () => {});
 

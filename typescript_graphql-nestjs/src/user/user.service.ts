@@ -56,11 +56,11 @@ export class UserService {
     return user;
   }
 
-  async draftByUser(userUniqueInput: UserUniqueInput): Promise<Post[] | null> {
+  async draftByUser(email: string): Promise<Post[] | null> {
     return await this.prisma.user
       .findUnique({
         where: {
-          email: userUniqueInput.email || undefined,
+          email: email || undefined,
         },
       })
       .posts({

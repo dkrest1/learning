@@ -29,10 +29,8 @@ export class UserResolver {
   }
 
   @Query(() => [Post], { nullable: true })
-  async draftsByUser(
-    @Args('userUniqueInput') userUniqueInput: UserUniqueInput,
-  ): Promise<Post[] | null> {
-    return await this.userService.draftByUser(userUniqueInput);
+  async draftsByUser(@Args('email') email: string): Promise<Post[] | null> {
+    return await this.userService.draftByUser(email);
   }
 
   @Mutation(() => User)
